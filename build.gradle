@@ -65,7 +65,9 @@ binaries.withType(SharedLibraryBinary) { binary ->
   def deobfJar = project.tasks.findByName('deobfJar')
 
   universalJar.into('lib') { from binary.sharedLibraryFile }
+  universalJar.dependsOn binary
   deobfJar.into('lib') { from binary.sharedLibraryFile }
+  deobfJar.dependsOn binary
 }
 
 jar {
