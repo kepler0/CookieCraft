@@ -59,3 +59,27 @@ libraries {
     }
   }
 }
+
+jar {
+  //from libraries.main.binaries.shared
+  classifier = 'universal'
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.java
+  from sources.main.cpp.source
+  from nativeHeaders
+  classifier = 'src'
+}
+
+task deobfJar(type: Jar) {
+  //from libraries.main.binaries.shared
+  from sourceSets.main.output
+  classifier = 'deobf'
+}
+
+artifacts {
+  archives jar
+  archives sourceJar
+  archives deobfJar
+}
