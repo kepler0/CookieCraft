@@ -43,3 +43,19 @@ task nativeHeaders {
     }
   }
 }
+
+libraries {
+  main {
+    binaries.all {
+      cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include"
+      if (targetPlatform.operatingSystem.macOsX) { cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/darwin" }
+      else if (targetPlatform.operatingSystem.linux) { cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/linux" }
+      else if (targetPlatform.operatingSystem.windows) { cppCompiler.args "-I${org.gradle.internal.jvm.Jvm.current().javaHome}/include/win32" }
+      else if (targetPlatform.operatingSystem.freeBSD) { cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/freebsd" }
+      cppCompiler.args "-I${nativeHeadersDir}"
+      tasks.withType(CppCompile) { task ->
+        task.dependsOn nativeHeaders
+      }
+    }
+  }
+}
