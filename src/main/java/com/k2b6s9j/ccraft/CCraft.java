@@ -1,4 +1,4 @@
-package com.k2b6s9j.CCraft;
+package com.k2b6s9j.ccraft;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
