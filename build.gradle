@@ -60,8 +60,15 @@ libraries {
   }
 }
 
+binaries.withType(SharedLibraryBinary) { binary ->
+  def universalJar = project.tasks.findByName('jar')
+  def deobfJar = project.tasks.findByName('deobfJar')
+
+  universalJar.into('lib') { from binary.sharedLibraryFile }
+  deobfJar.into('lib') { from binary.sharedLibraryFile }
+}
+
 jar {
-  //from libraries.main.binaries.shared
   classifier = 'universal'
 }
 
@@ -73,7 +80,6 @@ task sourceJar(type: Jar) {
 }
 
 task deobfJar(type: Jar) {
-  //from libraries.main.binaries.shared
   from sourceSets.main.output
   classifier = 'deobf'
 }
