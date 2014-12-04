@@ -2,11 +2,6 @@ apply plugin: 'java'
 apply plugin: 'cpp'
 apply plugin: 'forge'
 
-executables {
-  main {
-  }
-}
-
 buildscript {
   repositories {
     mavenCentral()
@@ -30,4 +25,21 @@ buildscript {
 
 minecraft {
   version = '1.7.10-10.13.2.1230'
+}
+
+def nativeHeadersDir = file("$buildDir/nativeHeaders")
+
+task nativeHeaders {
+  def outputFile = file("$nativeHeadersDir/native.h")
+  inputs.files sourceSets.main.output
+  outputs.file outputFile
+  doLast {
+    outputFile.parentFile.mkdirs()
+    exec {
+      executable org.gradle.internal.jvm.Jvm.current().getExecutable('javah')
+      args '-o', outputFile
+      args '-classpath', sourceSets.main.runtimeClasspath.asPath
+      args 'com.k2b6s9j.ccraft.CCraft'
+    }
+  }
 }
