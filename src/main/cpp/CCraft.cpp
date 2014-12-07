@@ -15,7 +15,16 @@ JNIEXPORT void JNICALL Java_com_k2b6s9j_ccraft_CCraft_preInit(JNIEnv *env, jobje
   }
 
   /* Gets the Logger object from the getModLog method ID */
-  jobject Log = env->CallObjectMethod(obj, modLogID);
+  jobject Loggger = env->CallObjectMethod(obj, modLogID);
+
+  /* Gets the info method */
+  jmethodID logInfoMethodID = env->GetMethodID(Event, "info", "(Ljava/lang/String)V");
+  if (logInfoMethodID == NULL) {
+    /* error handling */
+  }
+
+  /* Logs Things */
+  env->CallObjectMethod(obj, logInfoMethodID, "Hello from C++");
 }
 
 JNIEXPORT void JNICALL Java_com_k2b6s9j_ccraft_CCraft_init(JNIEnv *env, jobject obj, jobject jevent) {
