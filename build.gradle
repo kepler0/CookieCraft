@@ -44,18 +44,49 @@ task nativeHeaders {
   }
 }
 
+def cppIncludes = [
+  "${org.gradle.internal.jvm.Jvm.current().javaHome}/include",
+  "${nativeHeadersDir}"
+]
+
 libraries {
   main {
     binaries.all {
-      cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include"
-      if (targetPlatform.operatingSystem.macOsX) { cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/darwin" }
-      else if (targetPlatform.operatingSystem.linux) { cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/linux" }
-      else if (targetPlatform.operatingSystem.windows) { cppCompiler.args "-I${org.gradle.internal.jvm.Jvm.current().javaHome}/include/win32" }
-      else if (targetPlatform.operatingSystem.freeBSD) { cppCompiler.args '-I', "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/freebsd" }
-      cppCompiler.args "-I${nativeHeadersDir}"
+      if (targetPlatform.operatingSystem.macOsX) {
+        cppIncludes <<
+        "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/darwin"
+      }
+      else if (targetPlatform.operatingSystem.linux) {
+        cppIncludes <<
+        "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/linux"
+      }
+      else if (targetPlatform.operatingSystem.windows) {
+        cppIncludes <<
+        "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/win32"
+      }
+      else if (targetPlatform.operatingSystem.freeBSD) {
+        cppIncludes <<
+        "${org.gradle.internal.jvm.Jvm.current().javaHome}/include/freebsd"
+      }
+      cppIncludes.each { dir ->
+        cppCompiler.args "-I${dir}"
+      }
       tasks.withType(CppCompile) { task ->
         task.dependsOn nativeHeaders
       }
+    }
+  }
+}
+
+task createLinterClangIncludeFile {
+  File outputFile = file(".linter-clang-includes")
+  inputs.file nativeHeaders
+  outputs.file outputFile
+  doLast {
+    outputFile.parentFile.mkdirs()
+    outputFile.delete()
+    cppIncludes.each { dir ->
+      outputFile << "${dir} "
     }
   }
 }
@@ -68,6 +99,8 @@ binaries.withType(SharedLibraryBinary) { binary ->
   universalJar.dependsOn binary
   deobfJar.into('lib') { from binary.sharedLibraryFile }
   deobfJar.dependsOn binary
+
+  createLinterClangIncludeFile.dependsOn binary
 }
 
 jar {

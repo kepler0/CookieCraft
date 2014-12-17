@@ -4,3 +4,5 @@ run/
 
 # Ignore Gradle GUI config
 gradle-app.setting
+
+.linter-clang-includes
